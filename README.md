@@ -4,10 +4,11 @@ Experiment code, input data and raw results for the article of the same name (20
 https://github.com/OlehZanevych/timetabling-solver-configuration-study-jais-2026
 
 Everything needed to reproduce the experiments is here: the C++20 solver, instance generator and
-independent validator (`src/`), the 48 instance files the study uses (`data/`), the per-run records
-the article was built from (`results/`), and the scripts that run every experiment and regenerate
-every table, figure and quoted number from those records (`scripts/`). The sections below say what
-each experiment measures, how to build and run it, and how to check a re-run against the records.
+independent validator (`src/`), the 24 instances the study uses with their planted schedules (48
+files in `data/`), the per-run records the article was built from (`results/`), and the scripts that
+run every experiment and regenerate every empirical table, the figure data and the numbers quoted
+through macros from those records (`scripts/`). The sections below say what each experiment
+measures, how to build and run it, and how to check a re-run against the records.
 
 The article compares the configuration choices *inside* one timetabling solver -- the acceptance
 criterion, its history length, the three levels of the escape from stagnation, where a perturbation
@@ -237,16 +238,18 @@ results/         one CSV per experiment, one line per run (plateau: one line per
 ## The records
 
 The files in `results/` were produced on 2026-10-03 by the sources in this directory, built as
-above (CMake Release, `-O3 -std=gnu++20`, g++ 13.3 on x86-64), with the commands in
-`scripts/run_all.sh`. The factor, ladder and dispersion campaigns -- the three that record
+above (CMake Release, `-O3 -std=gnu++20`, g++ 13.3), with the commands in `scripts/run_all.sh`, on
+an x86-64 Intel Xeon processor at 2.10 GHz under Ubuntu 24.04 (Linux 6.18). The factor, ladder and dispersion campaigns -- the three that record
 wall-clock -- were each run alone, so `elapsed_ms` is uncontended; the crossed, trace and
 construction campaigns record no time. Values are written with fifteen significant digits, so every
 objective is exact.
 
-The same values were obtained before: an earlier complete execution, by a driver that recorded fewer
-columns and rounded objectives to six digits, agrees with these files on every shared column of
-every run, and the factor and crossed campaigns were re-run one run per process on aarch64 with
-g++ 11.4 and agree exactly. Nothing in the drivers depends on the platform -- the generator is a
+The same values were obtained more than once. An earlier complete execution, by a driver that
+recorded fewer columns and rounded objectives to six significant digits, agrees with these files on
+every shared non-timing column of every run, allowing for that rounding; a second execution of the
+factor, ladder and dispersion campaigns with the current build agrees on every non-timing column;
+and the factor and crossed campaigns were re-run one run per process on aarch64 with g++ 11.4 and
+agree exactly. Nothing in the drivers depends on the platform -- the generator is a
 fixed xoshiro256** with its own integer sampling and shuffle, runs are single-threaded, no unordered
 container is iterated, every sort has a total order, there is no `-ffast-math`, and wall-clock
 enters a run only through a 1800 s safety deadline that the longest run does not approach -- but
